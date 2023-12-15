@@ -1,18 +1,27 @@
 locals {
   empty = {}
   initProcessEnabled = {
-  "initProcessEnabled": true
+    "initProcessEnabled" : true
+  }
+  windows_entrypoint = {
+    "entryPoint" : ["powershell", "-Command"]
+  }
+  windows_command = {
+    "command" : ["ping -t localhost"]
   }
 }
 
 locals {
-  empty_json = jsonencode(local.empty)
+  empty_json              = jsonencode(local.empty)
   initProcessEnabled_json = jsonencode(local.initProcessEnabled)
+  windows_entrypoint_json = jsonencode(local.windows_entrypoint)
+  windows_command_json    = jsonencode(local.windows_command)
 }
 
 locals {
-  os_family = upper(var.os_family)
-  LinuxParameters = startswith(local.os_family, "LINUX") ? local.initProcessEnabled_json : local.empty_json
+  os_family        = upper(var.os_family)
+  LinuxParameters  = startswith(local.os_family, "LINUX") ? local.initProcessEnabled_json : local.empty_json
+  WindowEntryPoint = startswith(local.os_family, "WINDOW_SERVER") ? local.windows_entrypoint_json : local.empty_json
 }
 
 resource "aws_ecs_cluster" "ecs_exec" {

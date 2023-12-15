@@ -1,5 +1,5 @@
 data "external" "task_arn" {
-    program = ["bash","-c", "/usr/local/bin/aws ecs list-tasks --cluster ${aws_ecs_cluster.ecs_exec.name} --output json | jq -r '.taskArns[]' | jq -nR '{task_arn: input}'"] 
+  program = ["bash", "-c", "aws ecs list-tasks --cluster ${aws_ecs_cluster.ecs_exec.name} --output json | jq -r '.taskArns[]' | jq -nR '{task_arn: input}'"]
 }
 
 #output "execute_command" {
