@@ -8,8 +8,8 @@ locals {
   container_definition = {
     name       = var.container_name,
     image      = var.container_image,
-    command    = split(" ", var.command)
-    entryPoint = split(" ", var.entryPoint)
+    cpu        = var.task_cpu
+    memory     = var.task_memory
     logConfiguration = {
       logDriver = "awslogs",
       options = {
