@@ -1,15 +1,15 @@
 locals {
   linux_parameters = startswith(upper(var.os_family), "LINUX") ? {
-       "initProcessEnabled" : true
+    "initProcessEnabled" : true
   } : {}
 }
 
 locals {
   container_definition = {
-    name             = var.container_name,
-    image            = var.container_image,
-    command          = split(" ", var.command)
-    entryPoint       = split(" ", var.entryPoint)
+    name       = var.container_name,
+    image      = var.container_image,
+    command    = split(" ", var.command)
+    entryPoint = split(" ", var.entryPoint)
     logConfiguration = {
       logDriver = "awslogs",
       options = {
@@ -43,7 +43,7 @@ resource "aws_ecs_cluster" "ecs_exec" {
 }
 
 resource "aws_ecs_task_definition" "ecs_exec" {
- family                   = var.task_definition_name
+  family                   = var.task_definition_name
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ecs_exec_demo_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_exec_demo_task_role.arn
@@ -54,7 +54,7 @@ resource "aws_ecs_task_definition" "ecs_exec" {
     operating_system_family = var.os_family
     cpu_architecture        = var.cpu_arch
   }
- container_definitions = jsonencode([local.container_definition])
+  container_definitions = jsonencode([local.container_definition])
 }
 
 resource "aws_ecs_service" "ecs_exec" {
