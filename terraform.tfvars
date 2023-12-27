@@ -1,4 +1,25 @@
-subnet_public1_id = ""
-subnet_public2_id = ""
+subnet_public1_id = "subnet-abcd1234"
+subnet_public2_id = "subnet-abcd1234"
 log_group         = "/aws/ecs/ecs-exec-demo"
 s3_key_prefix     = "ecs-exec"
+
+task_definition_name = "ecs_exec"
+instance_count       = 1
+cluster_name         = "ecs-exec-cluster"
+service_name         = "ecs-exec"
+cpu_arch             = "X86_64"
+
+task_cpu        = "256"
+task_memory     = "512"
+container_name  = "nginx"
+container_image = "nginx"
+command         = "echo Hello"
+entryPoint      = "sh -c"
+
+#task_cpu             = "2048"
+#task_memory          = "4096"
+#container_name       = "windows_container"
+#container_image      = "mcr.microsoft.com/windows/servercore:ltsc2019"
+#os_family            = "WINDOWS_SERVER_2019_CORE"
+#command              = "ping -t localhost"
+#entryPoint           = "powershell -Command"

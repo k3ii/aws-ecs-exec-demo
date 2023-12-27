@@ -1,5 +1,29 @@
+locals {
+  linux_parameters = startswith(upper(var.os_family), "LINUX") ? {
+    "initProcessEnabled" : true
+  } : {}
+}
+
+locals {
+  container_definition = {
+    name       = var.container_name,
+    image      = var.container_image,
+    command    = split(" ", var.command)
+    entryPoint = split(" ", var.entryPoint)
+    logConfiguration = {
+      logDriver = "awslogs",
+      options = {
+        "awslogs-group"         = var.log_group,
+        "awslogs-region"        = data.aws_region.current.name,
+        "awslogs-stream-prefix" = "container-stdout"
+      }
+    },
+    linuxParameters = startswith(upper(var.os_family), "LINUX") ? local.linux_parameters : null,
+  }
+}
+
 resource "aws_ecs_cluster" "ecs_exec" {
-  name = "ecs-exec-cluster"
+  name = var.cluster_name
 
   configuration {
     execute_command_configuration {
@@ -11,7 +35,6 @@ resource "aws_ecs_cluster" "ecs_exec" {
         s3_bucket_name             = aws_s3_bucket.ecs_exec_output.bucket
         s3_key_prefix              = var.s3_key_prefix
       }
-
     }
   }
   depends_on = [
@@ -20,42 +43,25 @@ resource "aws_ecs_cluster" "ecs_exec" {
 }
 
 resource "aws_ecs_task_definition" "ecs_exec" {
-  family                   = "ecs-exec"
+  family                   = var.task_definition_name
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ecs_exec_demo_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_exec_demo_task_role.arn
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
   runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
+    operating_system_family = var.os_family
+    cpu_architecture        = var.cpu_arch
   }
-  container_definitions = <<TASK_DEFINITION
-    [
-    {"name": "nginx",
-            "image": "nginx",
-            "linuxParameters": {
-                "initProcessEnabled": true
-            },            
-            "logConfiguration": {
-                "logDriver": "awslogs",
-                    "options": {
-                       "awslogs-group": "/aws/ecs/ecs-exec-demo",
-                       "awslogs-region": "us-east-1",
-                       "awslogs-stream-prefix": "container-stdout"
-                    }
-        }
-    }
-    ]
-TASK_DEFINITION
+  container_definitions = jsonencode([local.container_definition])
 }
 
 resource "aws_ecs_service" "ecs_exec" {
-  name                   = "ecs-exec"
+  name                   = var.service_name
   cluster                = aws_ecs_cluster.ecs_exec.id
   task_definition        = aws_ecs_task_definition.ecs_exec.arn
-  desired_count          = 3
+  desired_count          = var.instance_count
   enable_execute_command = "true"
   launch_type            = "FARGATE"
   network_configuration {
@@ -72,5 +78,4 @@ resource "aws_ecs_service" "ecs_exec" {
     aws_ecs_task_definition.ecs_exec,
     aws_ecs_cluster.ecs_exec,
   ]
-
 }
