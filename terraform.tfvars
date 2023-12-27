@@ -1,5 +1,5 @@
-subnet_public1_id = "subnet-0b91c37ceef3bd2bd"
-subnet_public2_id = "subnet-0325cf1c141da3f04"
+subnet_public1_id = "subnet-abcd1234"
+subnet_public2_id = "subnet-abcd1234"
 log_group         = "/aws/ecs/ecs-exec-demo"
 s3_key_prefix     = "ecs-exec"
 
