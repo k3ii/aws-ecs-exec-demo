@@ -16,19 +16,20 @@
           });
 
     in {
+      packages = forAllSystems ({ pkgs, ... }: {
+        default = pkgs.terraform;
+      });
+
       formatter = forAllSystems ({ pkgs }: pkgs.nixfmt);
-      devShells = forAllSystems ({ pkgs }: {
-        blue = pkgs.mkShell {
-          name = "aws-tf";
-          nativeBuildInputs = [ pkgs.jq pkgs.terraform ];
-          LANG = "C";
-          AWESOME_TEAM = "blue";
-          NIXPKGS_ALLOW_UNFREE = 1;
-          shellHook = ''
-            echo "blue shell!"
-            cowsay "team $AWESOME_TEAM rocks!"
-          '';
-        };
+
+      devShells = forAllSystems ({ pkgs }: pkgs.mkShell {
+        name = "terraform-shell";  
+        nativeBuildInputs = [ pkgs.jq pkgs.terraform pkgs.ssm-session-manager-plugin pkgs.cowsay ];
+        LANG = "C";
+        NIXPKGS_ALLOW_UNFREE = 1;
+        shellHook = ''
+          cowsay "Welcome to My Dev Shell"
+        '';
       });
     };
 }

@@ -23,6 +23,14 @@ variable "task_definition_name" {
   type = string
 }
 
+variable "command" {
+  type = string
+}
+
+variable "entryPoint" {
+  type = string
+}
+
 variable "task_cpu" {
   type = number
 }
